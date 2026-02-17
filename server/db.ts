@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, companies, InsertCompany, tenders, products, documents, proposals } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,91 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ============================================
+// COMPANY QUERIES
+// ============================================
+
+export async function getCompanyByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(companies).where(eq(companies.userId, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function upsertCompany(data: InsertCompany) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.insert(companies).values(data).onDuplicateKeyUpdate({
+    set: {
+      companyName: data.companyName,
+      taxRegime: data.taxRegime,
+      taxPercentage: data.taxPercentage,
+      bankingData: data.bankingData,
+      legalRepresentative: data.legalRepresentative,
+      logoUrl: data.logoUrl,
+    },
+  });
+  return result;
+}
+
+// ============================================
+// TENDER QUERIES
+// ============================================
+
+export async function getUserTenders(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(tenders).where(eq(tenders.userId, userId)).orderBy(desc(tenders.createdAt));
+}
+
+export async function getTenderById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(tenders).where(eq(tenders.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// ============================================
+// PRODUCT QUERIES
+// ============================================
+
+export async function getUserProducts(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(products).where(eq(products.userId, userId)).orderBy(desc(products.createdAt));
+}
+
+// ============================================
+// DOCUMENT QUERIES
+// ============================================
+
+export async function getUserDocuments(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(documents).where(eq(documents.userId, userId)).orderBy(desc(documents.createdAt));
+}
+
+export async function getExpiredDocuments(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(documents).where(and(eq(documents.userId, userId), eq(documents.isExpired, true)));
+}
+
+// ============================================
+// PROPOSAL QUERIES
+// ============================================
+
+export async function getUserProposals(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(proposals).where(eq(proposals.userId, userId)).orderBy(desc(proposals.createdAt));
+}
+
+export async function getProposalById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(proposals).where(eq(proposals.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+

@@ -1,10 +1,12 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+import { z } from "zod";
+import { getCompanyByUserId, upsertCompany, getUserTenders, getUserDocuments, getUserProposals, getUserProducts } from "./db";
+import { InsertCompany } from "../drizzle/schema";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -17,12 +19,89 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  // ============================================
+  // COMPANY PROCEDURES
+  // ============================================
+  company: router({
+    getProfile: protectedProcedure.query(({ ctx }) =>
+      getCompanyByUserId(ctx.user.id)
+    ),
+    upsert: protectedProcedure
+      .input(z.object({
+        cnpj: z.string(),
+        companyName: z.string(),
+        legalName: z.string().optional(),
+        taxRegime: z.enum(["simples_nacional", "lucro_presumido", "lucro_real"]),
+        taxPercentage: z.string(),
+        bankingData: z.any().optional(),
+        legalRepresentative: z.any().optional(),
+        logoUrl: z.string().optional(),
+      }))
+      .mutation(({ ctx, input }) => {
+        const data: InsertCompany = {
+          userId: ctx.user.id,
+          ...input,
+        };
+        return upsertCompany(data);
+      }),
+  }),
+
+  // ============================================
+  // DASHBOARD PROCEDURES
+  // ============================================
+  dashboard: router({
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      const tenders = await getUserTenders(ctx.user.id);
+      const proposals = await getUserProposals(ctx.user.id);
+      const documents = await getUserDocuments(ctx.user.id);
+      const products = await getUserProducts(ctx.user.id);
+
+      return {
+        totalTenders: tenders.length,
+        totalProposals: proposals.length,
+        totalDocuments: documents.length,
+        totalProducts: products.length,
+        recentTenders: tenders.slice(0, 5),
+        recentProposals: proposals.slice(0, 5),
+      };
+    }),
+  }),
+
+  // ============================================
+  // TENDER PROCEDURES
+  // ============================================
+  tender: router({
+    list: protectedProcedure.query(({ ctx }) =>
+      getUserTenders(ctx.user.id)
+    ),
+  }),
+
+  // ============================================
+  // DOCUMENT PROCEDURES
+  // ============================================
+  document: router({
+    list: protectedProcedure.query(({ ctx }) =>
+      getUserDocuments(ctx.user.id)
+    ),
+  }),
+
+  // ============================================
+  // PROPOSAL PROCEDURES
+  // ============================================
+  proposal: router({
+    list: protectedProcedure.query(({ ctx }) =>
+      getUserProposals(ctx.user.id)
+    ),
+  }),
+
+  // ============================================
+  // PRODUCT PROCEDURES
+  // ============================================
+  product: router({
+    list: protectedProcedure.query(({ ctx }) =>
+      getUserProducts(ctx.user.id)
+    ),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
