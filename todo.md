@@ -70,3 +70,13 @@
 - [ ] Documentação do sistema
 - [ ] Checkpoint final
 - [ ] Apresentação ao usuário
+
+## Fase 5: Cadastro da Empresa e Gestao de Documentos
+- [x] Criar procedimento tRPC para busca de CNPJ via API ReceitaWS
+- [x] Validar e formatar CNPJ no frontend
+- [x] Desenvolver componente de formulario de cadastro da empresa
+- [ ] Implementar upload de logomarca com S3
+- [x] Criar pagina de configuracao da empresa
+- [ ] Implementar gestao de documentos com controle de validade
+- [ ] Adicionar alertas de vencimento de documentos
+- [x] Criar testes unitarios para procedimentos de empresa

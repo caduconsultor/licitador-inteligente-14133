@@ -26,6 +26,42 @@ export const appRouter = router({
     getProfile: protectedProcedure.query(({ ctx }) =>
       getCompanyByUserId(ctx.user.id)
     ),
+    searchCNPJ: protectedProcedure
+      .input(z.object({
+        cnpj: z.string(),
+      }))
+      .query(async ({ input }) => {
+        try {
+          const cleanCNPJ = input.cnpj.replace(/\D/g, "");
+          const response = await fetch(
+            `https://www.receitaws.com.br/v1/cnpj/${cleanCNPJ}`,
+            { signal: AbortSignal.timeout(10000) }
+          );
+
+          if (!response.ok) {
+            return { success: false, error: "CNPJ nao encontrado" };
+          }
+
+          const data = await response.json();
+          if (data.status === "ERROR") {
+            return { success: false, error: data.message || "CNPJ nao encontrado" };
+          }
+
+          return {
+            success: true,
+            data: {
+              cnpj: data.cnpj,
+              companyName: data.nome,
+              legalName: data.nome_fantasia || data.nome,
+              phone: data.telefone,
+              email: data.email,
+            },
+          };
+        } catch (error) {
+          console.error("Erro ao buscar CNPJ:", error);
+          return { success: false, error: "Erro ao buscar dados do CNPJ" };
+        }
+      }),
     upsert: protectedProcedure
       .input(z.object({
         cnpj: z.string(),
