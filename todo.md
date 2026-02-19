@@ -91,3 +91,12 @@
 - [x] Criar componente de upload com drag-and-drop
 - [x] Desenvolver página de visualização de editais analisados
 - [ ] Criar testes para procedimentos de análise
+
+
+## Fase 6.1: Pagina de Detalhes do Edital
+- [x] Criar componente de visualizacao de requisitos estruturados
+- [x] Implementar checklist dinamico de documentos necessarios
+- [x] Criar pagina TenderDetail.tsx com rota parametrizada
+- [x] Adicionar comparacao entre documentos exigidos e cadastrados
+- [x] Implementar alertas de documentos vencidos ou faltantes
+- [ ] Criar testes para componentes de detalhes

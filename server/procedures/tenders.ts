@@ -44,8 +44,11 @@ export const tendersRouter = router({
 
         const tenderData = {
           userId: ctx.user.id,
+          title: (analysis as any).object || input.fileName,
+          description: "",
           fileName: input.fileName,
           fileUrl,
+          fileType: input.mimeType.includes("word") ? "docx" : "pdf",
           tenderObject: (analysis as any).object || "Nao informado",
           deadlineSubmission: new Date(),
           habilitationRequirements: (analysis as any).requirements || {},
@@ -55,7 +58,10 @@ export const tendersRouter = router({
           analysisStatus: "completed" as const,
         };
 
-        await database.insert(tenders).values(tenderData as any);
+        await database.insert(tenders).values(tenderData as any).catch(err => {
+          console.error("Insert error:", err);
+          throw err;
+        });
 
         return { success: true, analysis, fileUrl };
       } catch (error) {

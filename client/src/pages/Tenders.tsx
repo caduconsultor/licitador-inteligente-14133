@@ -5,11 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { TenderUpload } from "@/components/TenderUpload";
 import { trpc } from "@/lib/trpc";
 import { Trash2, Eye, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function Tenders() {
+  const [, setLocation] = useLocation();
   const { data: tenders = [], isLoading, refetch } = trpc.tenders.listTenders.useQuery();
   const deleteMutation = trpc.tenders.deleteTender.useMutation();
 
@@ -118,7 +120,12 @@ export default function Tenders() {
                   )}
 
                   <div className="flex gap-2 pt-2">
-                    <Button size="sm" variant="outline" className="flex-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setLocation(`/tenders/${tender.id}`)}
+                    >
                       <Eye className="h-4 w-4 mr-2" />
                       Ver Detalhes
                     </Button>

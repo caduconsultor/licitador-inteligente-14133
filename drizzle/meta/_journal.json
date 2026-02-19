@@ -15,6 +15,20 @@
       "when": 1771347130777,
       "tag": "0001_bent_lionheart",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1771507665311,
+      "tag": "0002_nifty_satana",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1771507736663,
+      "tag": "0003_numerous_lila_cheney",
+      "breakpoints": true
     }
   ]
 }
