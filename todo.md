@@ -80,3 +80,14 @@
 - [ ] Implementar gestao de documentos com controle de validade
 - [ ] Adicionar alertas de vencimento de documentos
 - [x] Criar testes unitarios para procedimentos de empresa
+
+
+## Fase 6: Upload e Analise de Editais com IA
+- [x] Criar procedimento tRPC para upload de arquivo (PDF/Word)
+- [x] Implementar extração de texto de PDFs
+- [x] Criar procedimento tRPC para análise com IA (LLM)
+- [x] Extrair: objeto, prazos, requisitos, itens/lotes, critérios
+- [x] Salvar análise no banco de dados
+- [x] Criar componente de upload com drag-and-drop
+- [x] Desenvolver página de visualização de editais analisados
+- [ ] Criar testes para procedimentos de análise

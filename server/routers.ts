@@ -5,9 +5,11 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { getCompanyByUserId, upsertCompany, getUserTenders, getUserDocuments, getUserProposals, getUserProducts } from "./db";
 import { InsertCompany } from "../drizzle/schema";
+import { tendersRouter } from "./procedures/tenders";
 
 export const appRouter = router({
   system: systemRouter,
+  tenders: tendersRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
