@@ -110,3 +110,14 @@
 - [x] Criar página de gestão de documentos
 - [x] Adicionar alertas de vencimento (30, 60, 90 dias)
 - [ ] Criar testes para procedimentos de documentos
+
+
+## Fase 8: Calculadora de Precificacao para Produtos
+- [x] Criar procedimentos tRPC para calculo de precificacao
+- [x] Implementar logica de calculo de impostos baseado em regime tributario
+- [x] Criar componente de formulario de entrada de produtos
+- [x] Implementar calculo de margem de lucro
+- [x] Adicionar distribuicao de frete por peso/valor
+- [x] Criar resumo financeiro com breakdown de custos
+- [ ] Implementar persistencia de calculos
+- [ ] Criar testes para procedimentos de precificacao

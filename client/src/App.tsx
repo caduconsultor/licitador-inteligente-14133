@@ -9,6 +9,7 @@ import CompanySettings from "./pages/CompanySettings";
 import Tenders from "./pages/Tenders";
 import TenderDetail from "./pages/TenderDetail";
 import Documents from "./pages/Documents";
+import PricingCalculator from "./pages/PricingCalculator";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path={"/tenders"} component={Tenders} />
       <Route path={"/tenders/:id"} component={TenderDetail} />
       <Route path={"/documents"} component={Documents} />
+      <Route path={"/pricing"} component={PricingCalculator} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
