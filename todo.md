@@ -121,3 +121,14 @@
 - [x] Criar resumo financeiro com breakdown de custos
 - [ ] Implementar persistencia de calculos
 - [ ] Criar testes para procedimentos de precificacao
+
+
+## Fase 9: Gerador de Propostas em PDF
+- [x] Criar procedimentos tRPC para geracao de propostas
+- [x] Implementar template de proposta com normas ABNT
+- [x] Adicionar dados da empresa (logomarca, endereco, contato)
+- [x] Criar formulario de entrada de itens da proposta
+- [x] Implementar calculo automatico de totais
+- [x] Gerar PDF com ReportLab/WeasyPrint
+- [x] Adicionar assinatura digital ou espaco para assinatura
+- [ ] Criar testes para procedimentos de propostas

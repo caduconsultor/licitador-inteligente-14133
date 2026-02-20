@@ -8,12 +8,14 @@ import { InsertCompany } from "../drizzle/schema";
 import { tendersRouter } from "./procedures/tenders";
 import { documentsRouter } from "./procedures/documents";
 import { pricingRouter } from "./procedures/pricing";
+import { proposalsRouter } from "./procedures/proposals";
 
 export const appRouter = router({
   system: systemRouter,
   tenders: tendersRouter,
   documents: documentsRouter,
   pricing: router(pricingRouter),
+  proposals: router(proposalsRouter),
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
