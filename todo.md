@@ -100,3 +100,13 @@
 - [x] Adicionar comparacao entre documentos exigidos e cadastrados
 - [x] Implementar alertas de documentos vencidos ou faltantes
 - [ ] Criar testes para componentes de detalhes
+
+
+## Fase 7: Gestao de Documentos da Empresa
+- [x] Criar procedimentos tRPC para upload, listagem e deleção de documentos
+- [x] Implementar upload de arquivos com S3
+- [x] Criar componente de upload de documentos
+- [x] Implementar cálculo automático de validade (180 dias)
+- [x] Criar página de gestão de documentos
+- [x] Adicionar alertas de vencimento (30, 60, 90 dias)
+- [ ] Criar testes para procedimentos de documentos

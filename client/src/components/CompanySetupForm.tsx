@@ -17,7 +17,7 @@ const formSchema = z.object({
   companyName: z.string().min(3, "Nome da empresa obrigatorio"),
   legalName: z.string().optional(),
   taxRegime: z.enum(["simples_nacional", "lucro_presumido", "lucro_real"]),
-  taxPercentage: z.string().min(1, "Percentual de imposto obrigatorio"),
+  taxPercentage: z.coerce.number().min(0).max(100, "Percentual deve estar entre 0 e 100"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -27,14 +27,14 @@ export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
   const [isSearching, setIsSearching] = useState(false);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       cnpj: "",
       companyName: "",
       legalName: "",
       taxRegime: "simples_nacional",
-      taxPercentage: "",
-    },
+      taxPercentage: 0,
+    } as any,
   });
 
   const searchCNPJMutation = trpc.company.searchCNPJ.useQuery(
@@ -64,11 +64,11 @@ export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
       const result = await searchCNPJMutation.refetch();
       if (result.data?.success && result.data.data) {
         setCnpjData(result.data.data);
-        form.setValue("companyName", result.data.data.companyName);
-        form.setValue("legalName", result.data.data.legalName);
+        form.setValue("companyName", result.data.data.name || "");
+        form.setValue("legalName", result.data.data.legalName || "");
         toast.success("Dados encontrados!");
       } else {
-        toast.error(result.data?.error || "CNPJ nao encontrado");
+        toast.error("CNPJ nao encontrado");
       }
     } catch (error) {
       toast.error("Erro ao buscar CNPJ");
@@ -78,7 +78,10 @@ export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   const onSubmit = (values: FormValues) => {
-    upsertMutation.mutate(values);
+    upsertMutation.mutate({
+      ...values,
+      taxPercentage: typeof values.taxPercentage === 'string' ? parseFloat(values.taxPercentage) : values.taxPercentage,
+    });
   };
 
   return (
