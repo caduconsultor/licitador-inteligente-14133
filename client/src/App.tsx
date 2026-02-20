@@ -11,6 +11,7 @@ import TenderDetail from "./pages/TenderDetail";
 import Documents from "./pages/Documents";
 import PricingCalculator from "./pages/PricingCalculator";
 import ProposalGenerator from "./pages/ProposalGenerator";
+import DeclarationsGenerator from "./pages/DeclarationsGenerator";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <Route path={"/documents"} component={Documents} />
       <Route path={"/pricing"} component={PricingCalculator} />
       <Route path={"/proposals"} component={ProposalGenerator} />
+      <Route path={"/declarations"} component={DeclarationsGenerator} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

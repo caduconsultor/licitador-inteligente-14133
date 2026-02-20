@@ -132,3 +132,14 @@
 - [x] Gerar PDF com ReportLab/WeasyPrint
 - [x] Adicionar assinatura digital ou espaco para assinatura
 - [ ] Criar testes para procedimentos de propostas
+
+
+## Fase 10: Gerador de Declaracoes Lei 14.133/2021
+- [x] Criar procedimentos tRPC para geracao de declaracoes
+- [x] Implementar templates de declaracoes padrao (juridica, tecnica, fiscal, economica)
+- [x] Adicionar campos dinamicos de preenchimento
+- [x] Implementar geracao de PDF com assinatura
+- [x] Criar interface de seleção de tipo de declaracao
+- [x] Adicionar validacao de dados obrigatorios
+- [ ] Implementar persistencia de declaracoes geradas
+- [ ] Criar testes para procedimentos de declaracoes

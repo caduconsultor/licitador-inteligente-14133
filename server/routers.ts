@@ -9,6 +9,7 @@ import { tendersRouter } from "./procedures/tenders";
 import { documentsRouter } from "./procedures/documents";
 import { pricingRouter } from "./procedures/pricing";
 import { proposalsRouter } from "./procedures/proposals";
+import { declarationsRouter } from "./procedures/declarations";
 
 export const appRouter = router({
   system: systemRouter,
@@ -16,6 +17,7 @@ export const appRouter = router({
   documents: documentsRouter,
   pricing: router(pricingRouter),
   proposals: router(proposalsRouter),
+  declarations: router(declarationsRouter),
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
