@@ -154,3 +154,14 @@
 - [x] Criar alertas de documentos vencidos
 - [x] Adicionar metricas de propostas geradas
 - [ ] Implementar filtros e busca no dashboard
+
+
+## Fase 12: Gerenciador de Produtos e Fornecedores
+- [x] Criar procedimentos tRPC para CRUD de produtos
+- [x] Implementar procedimento para importação de CSV
+- [x] Criar procedimento para busca e autocomplete de produtos
+- [x] Desenvolver componente de formulário de cadastro de produtos
+- [x] Implementar componente de importação CSV com validação
+- [x] Criar página de gerenciamento de produtos
+- [ ] Implementar busca e filtros na lista de produtos
+- [ ] Criar testes para procedimentos de produtos

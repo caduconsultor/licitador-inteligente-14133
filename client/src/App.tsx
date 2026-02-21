@@ -12,12 +12,14 @@ import TenderDetail from "./pages/TenderDetail";
 import Documents from "./pages/Documents";
 import PricingCalculator from "./pages/PricingCalculator";
 import ProposalGenerator from "./pages/ProposalGenerator";
+import Products from "./pages/Products";
 import DeclarationsGenerator from "./pages/DeclarationsGenerator";
 
 function Router() {
   return (
     <Switch>
       <Route path={"="} component={Dashboard} />
+      <Route path={"=/products"} component={Products} />
       <Route path={"/settings/company"} component={CompanySettings} />
       <Route path={"/tenders"} component={Tenders} />
       <Route path={"/tenders/:id"} component={TenderDetail} />
