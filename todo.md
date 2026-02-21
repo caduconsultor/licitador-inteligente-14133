@@ -143,3 +143,14 @@
 - [x] Adicionar validacao de dados obrigatorios
 - [ ] Implementar persistencia de declaracoes geradas
 - [ ] Criar testes para procedimentos de declaracoes
+
+
+## Fase 11: Dashboard Avancado com Estatisticas
+- [x] Criar procedimentos tRPC para obter estatisticas de editais
+- [x] Implementar calculo de prazos criticos e alertas
+- [x] Criar widgets de resumo (total, por status, vencidos)
+- [x] Adicionar grafico de editais por mes
+- [x] Implementar lista de propostas recentes
+- [x] Criar alertas de documentos vencidos
+- [x] Adicionar metricas de propostas geradas
+- [ ] Implementar filtros e busca no dashboard

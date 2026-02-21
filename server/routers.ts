@@ -10,6 +10,7 @@ import { documentsRouter } from "./procedures/documents";
 import { pricingRouter } from "./procedures/pricing";
 import { proposalsRouter } from "./procedures/proposals";
 import { declarationsRouter } from "./procedures/declarations";
+import { dashboardRouter } from "./procedures/dashboard";
 
 export const appRouter = router({
   system: systemRouter,
@@ -18,6 +19,7 @@ export const appRouter = router({
   pricing: router(pricingRouter),
   proposals: router(proposalsRouter),
   declarations: router(declarationsRouter),
+  dashboard: router(dashboardRouter),
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
