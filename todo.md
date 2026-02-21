@@ -165,3 +165,14 @@
 - [x] Criar página de gerenciamento de produtos
 - [ ] Implementar busca e filtros na lista de produtos
 - [ ] Criar testes para procedimentos de produtos
+
+
+## Fase 13: Integracao de Produtos nas Propostas
+- [x] Criar componente de autocomplete de produtos
+- [x] Integrar busca de produtos na calculadora de precificacao
+- [x] Implementar preenchimento automatico de dados do produto
+- [ ] Adicionar validacao de quantidade e preco
+- [ ] Criar lista de itens selecionados com calculo automatico
+- [ ] Implementar remocao de itens da proposta
+- [ ] Adicionar persistencia de propostas no banco de dados
+- [ ] Criar testes para integracao de produtos

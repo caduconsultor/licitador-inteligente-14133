@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calculator, DollarSign, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/DashboardLayout";
+import ProductAutocomplete from "@/components/ProductAutocomplete";
 
 export default function PricingCalculator() {
   const [productTab, setProductTab] = useState("products");
@@ -17,6 +18,7 @@ export default function PricingCalculator() {
   const [productName, setProductName] = useState("");
   const [unitCost, setUnitCost] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [profitMargin, setProfitMargin] = useState("30");
   const [taxRegime, setTaxRegime] = useState("simples_nacional");
   const [taxPercentage, setTaxPercentage] = useState("15");
@@ -56,6 +58,12 @@ export default function PricingCalculator() {
       toast.error("Erro ao calcular BDI: " + error.message);
     },
   });
+
+  const handleProductSelect = (product: any) => {
+    setSelectedProduct(product);
+    setProductName(product.name);
+    setUnitCost(product.cost.toString());
+  };
 
   const handleCalculateProduct = () => {
     if (!productName || !unitCost || !quantity) {
@@ -121,11 +129,7 @@ export default function PricingCalculator() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Nome do Produto *</Label>
-                    <Input
-                      value={productName}
-                      onChange={(e) => setProductName(e.target.value)}
-                      placeholder="Ex: Parafuso M8"
-                    />
+                    <ProductAutocomplete onProductSelect={handleProductSelect} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
