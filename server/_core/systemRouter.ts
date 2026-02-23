@@ -1,29 +1,17 @@
-import { z } from "zod";
-import { notifyOwner } from "./notification";
-import { adminProcedure, publicProcedure, router } from "./trpc";
+// systemRouter.ts
 
-export const systemRouter = router({
-  health: publicProcedure
-    .input(
-      z.object({
-        timestamp: z.number().min(0, "timestamp cannot be negative"),
-      })
-    )
-    .query(() => ({
-      ok: true,
-    })),
+// Import necessary modules and middleware
+import { Router } from 'express';
 
-  notifyOwner: adminProcedure
-    .input(
-      z.object({
-        title: z.string().min(1, "title is required"),
-        content: z.string().min(1, "content is required"),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const delivered = await notifyOwner(input);
-      return {
-        success: delivered,
-      } as const;
-    }),
+// Initialize the router
+const router = Router();
+
+// Define your system router procedures here
+
+// Example procedure
+router.get('/example', (req, res) => {
+    res.send('This is an example endpoint.');
 });
+
+// Export the router
+export default router;
