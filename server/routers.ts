@@ -17,12 +17,12 @@ export const appRouter = router({
   system: systemRouter,
   tenders: tendersRouter,
   documents: documentsRouter,
-  pricing: router(pricingRouter),
-  proposals: router(proposalsRouter),
-  declarations: router(declarationsRouter),
-  dashboard: router(dashboardRouter),
-  products: router(productsRouter),
-  suppliers: router(suppliersRouter),
+  pricing: pricingRouter,
+  proposals: proposalsRouter,
+  declarations: declarationsRouter,
+  dashboard: dashboardRouter,
+  products: productsRouter,
+  suppliers: suppliersRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
