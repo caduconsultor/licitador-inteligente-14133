@@ -9,6 +9,7 @@ import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import DashboardLayout from "@/components/DashboardLayout";
 
 export default function Tenders() {
   const [, setLocation] = useLocation();
@@ -58,7 +59,8 @@ export default function Tenders() {
   };
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Editais</h1>
         <p className="text-gray-600 mt-2">Gerencie e analise seus editais de licitacao</p>
@@ -144,6 +146,7 @@ export default function Tenders() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

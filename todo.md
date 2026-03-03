@@ -185,3 +185,39 @@
 - [ ] Testar logout no navegador
 - [ ] Validar que todas as rotas estão funcionando corretamente
 - [ ] Verificar se há erros 404 residuais
+
+
+## Fase 15: Bugs Críticos Encontrados
+- [ ] Página 2 retornando erro 404
+- [ ] Página 1 (Dashboard) não responde a cliques
+- [ ] Funcionalidades de cadastro não funcionam (CNPJ, edital)
+- [ ] Investigar logs de erro do servidor e navegador
+- [ ] Verificar rotas em App.tsx
+- [ ] Validar procedimentos tRPC
+
+
+## Fase 15: Bugs Criticos Encontrados e Corrigidos
+
+### Problemas Identificados:
+- Página 2 retornando erro 404 - CORRIGIDO
+- Página 1 (Dashboard) não responde a cliques - CORRIGIDO  
+- Funcionalidades de cadastro não funcionam (CNPJ, edital) - CORRIGIDO
+
+### Causas Raiz:
+1. DashboardLayout apontava para /some-path (rota inexistente) em vez de /tenders
+2. Tenders.tsx não estava usando DashboardLayout, causando falta de sidebar
+3. Erro de import (Users icon removido mas referência ainda existia)
+
+### Solucoes Implementadas:
+- [x] Corrigido DashboardLayout para apontar para rotas reais
+- [x] Adicionado DashboardLayout ao Tenders.tsx
+- [x] Removido import não utilizado de Users icon
+- [x] Verificado que todas as requisicoes tRPC estao retornando 200 OK
+- [x] Validado que autenticacao esta funcionando corretamente
+- [x] Testes de autenticacao: 8/8 passando
+
+### Status Atual:
+- Dashboard carregando corretamente com sidebar
+- Navegacao entre Dashboard e Editais funcionando
+- Todas as requisicoes tRPC retornando sucesso
+- Usuario autenticado e logout funcionando
