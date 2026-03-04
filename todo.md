@@ -258,3 +258,24 @@ Cache de tRPC nao estava sendo invalidado apos upsert. A pagina usava window.loc
 - [x] Cache invalidado apos upsert
 - [x] Dados visualizados imediatamente apos cadastro
 - [x] Testes de autenticacao passando (9/9)
+
+
+## Fase 17: Validacao em Tempo Real do Formulario de CNPJ
+
+- [ ] Implementar validacao de formato CNPJ em tempo real
+- [ ] Implementar busca automatica de dados da empresa
+- [ ] Adicionar feedback visual (loading, success, error)
+- [ ] Mostrar dados da empresa encontrada
+- [ ] Validar e testar todas as validacoes
+- [ ] Criar testes unitarios para validacoes
+
+
+### Melhorias Implementadas em Validacao em Tempo Real:
+- [x] Validacao de CNPJ usando algoritmo de checksum
+- [x] Busca automatica apos 500ms de inatividade
+- [x] Feedback visual com icones (valido, invalido, buscando, encontrado)
+- [x] Exibicao de dados encontrados em card verde
+- [x] Desabilitacao de botao de busca quando CNPJ invalido
+- [x] Bordas coloridas no input (verde para valido, vermelho para invalido)
+- [x] 9/9 testes de validacao CNPJ passando
+- [x] 20/22 testes totais passando
