@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, userId, cnpj, companyName, taxRegime, createdAt FROM companies ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user GmPdTyFMXXCAx2J.root --database jXsgxnn8Xq6EfJj32hpRqr --execute SELECT id, userId, cnpj, companyName, taxRegime, createdAt FROM companies ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "30001",
+      "userId": "1",
+      "cnpj": "15558847000163",
+      "companyName": "CONSTRUTORA BRAZIL LTDA",
+      "taxRegime": "simples_nacional",
+      "createdAt": "2026-03-04 00:49:29"
+    },
+    {
+      "id": "1",
+      "userId": "1",
+      "cnpj": "44654365000105",
+      "companyName": "CS VIDRACARIA LTDA",
+      "taxRegime": "simples_nacional",
+      "createdAt": "2026-02-18 21:05:51"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tcnpj\tcompanyName\ttaxRegime\tcreatedAt\n30001\t1\t15558847000163\tCONSTRUTORA BRAZIL LTDA\tsimples_nacional\t2026-03-04 00:49:29\n1\t1\t44654365000105\tCS VIDRACARIA LTDA\tsimples_nacional\t2026-02-18 21:05:51\n",
+  "stderr": "",
+  "execution_time_ms": 471
+}

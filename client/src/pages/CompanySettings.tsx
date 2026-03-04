@@ -10,6 +10,7 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 export default function CompanySettings() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
   const { data: company, isLoading } = trpc.company.getProfile.useQuery();
 
   if (!isAuthenticated) {
@@ -96,8 +97,8 @@ export default function CompanySettings() {
             </Card>
 
             <CompanySetupForm
-              onSuccess={() => {
-                window.location.reload();
+              onSuccess={async () => {
+                await utils.company.getProfile.invalidate();
               }}
             />
           </div>

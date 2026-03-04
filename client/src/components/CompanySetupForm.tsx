@@ -25,6 +25,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
   const [cnpjData, setCnpjData] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const utils = trpc.useUtils();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as any,
@@ -43,8 +44,9 @@ export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
   );
 
   const upsertMutation = trpc.company.upsert.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Empresa cadastrada com sucesso!");
+      await utils.company.getProfile.invalidate();
       onSuccess?.();
     },
     onError: (error) => {

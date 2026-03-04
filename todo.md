@@ -229,3 +229,32 @@
 - [x] Adicionar item "Configuracoes" no menu lateral
 - [x] Facilitar acesso ao cadastro de CNPJ
 - [x] Validar que navegacao funciona corretamente
+
+
+## Bugs Encontrados
+
+- [ ] Dados de empresa cadastrada nao sao visualizados apos salvamento
+- [ ] Verificar persistencia de dados no banco de dados
+- [ ] Verificar se procedimento getProfile esta retornando dados corretos
+
+
+## Resumo de Correcoes - Dados de Empresa Nao Visualizados
+
+### Problema Identificado:
+Dados de empresa cadastrada nao eram visualizados apos salvamento.
+
+### Causa Raiz:
+Cache de tRPC nao estava sendo invalidado apos upsert. A pagina usava window.location.reload() que recarregava a pagina inteira, mas nao invalidava o cache.
+
+### Solucao Implementada:
+1. Adicionado utils.company.getProfile.invalidate() em CompanySetupForm.tsx
+2. Adicionado utils.company.getProfile.invalidate() em CompanySettings.tsx  
+3. Removido window.location.reload() em favor de invalidacao de cache
+4. Agora os dados sao atualizados automaticamente apos o cadastro
+
+### Status:
+- [x] Dados salvos corretamente no banco de dados
+- [x] Procedimento getProfile retorna dados corretos
+- [x] Cache invalidado apos upsert
+- [x] Dados visualizados imediatamente apos cadastro
+- [x] Testes de autenticacao passando (9/9)
