@@ -221,3 +221,11 @@
 - Navegacao entre Dashboard e Editais funcionando
 - Todas as requisicoes tRPC retornando sucesso
 - Usuario autenticado e logout funcionando
+
+
+## Fase 16: Melhorias de Acessibilidade
+
+- [x] Adicionar botao "Configurar Empresa" no Dashboard
+- [x] Adicionar item "Configuracoes" no menu lateral
+- [x] Facilitar acesso ao cadastro de CNPJ
+- [x] Validar que navegacao funciona corretamente

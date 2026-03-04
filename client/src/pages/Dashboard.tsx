@@ -4,8 +4,10 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertTriangle, CheckCircle, Clock, FileText, TrendingUp, AlertCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, FileText, TrendingUp, AlertCircle, Settings } from "lucide-react";
+import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -13,6 +15,7 @@ const COLORS = ["#10b981", "#f59e0b", "#ef4444"];
 const RISK_COLORS = { low: "#10b981", medium: "#f59e0b", high: "#ef4444" };
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
   const { data: stats, isLoading: statsLoading } = trpc.dashboard.getStatistics.useQuery();
   const { data: timeline, isLoading: timelineLoading } = trpc.dashboard.getTendersTimeline.useQuery();
 
@@ -35,9 +38,19 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Visão geral de suas licitações e propostas</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <p className="text-gray-600 mt-2">Visão geral de suas licitações e propostas</p>
+          </div>
+          <Button 
+            onClick={() => setLocation("/settings/company")}
+            variant="outline"
+            className="gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Configurar Empresa
+          </Button>
         </div>
 
         {(stats?.alerts.criticalTenders?.length || 0) > 0 && (
