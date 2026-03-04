@@ -279,3 +279,17 @@ Cache de tRPC nao estava sendo invalidado apos upsert. A pagina usava window.loc
 - [x] Bordas coloridas no input (verde para valido, vermelho para invalido)
 - [x] 9/9 testes de validacao CNPJ passando
 - [x] 20/22 testes totais passando
+
+
+## Bugs Encontrados - Responsividade
+
+- [x] Formulario de CNPJ nao exibe dados corretamente em smartphone
+- [x] Verificar se ha problema de layout em dispositivos moveis
+- [x] Testar responsividade do CompanySetupForm
+
+### Melhorias de Responsividade Implementadas:
+- [x] Layout flex-col em mobile, flex-row em desktop para botao de busca
+- [x] Input com width full em mobile
+- [x] Grid de dados encontrados com 1 coluna em mobile, 2 em desktop
+- [x] Botao de busca com width full em mobile
+- [x] Todos os testes continuam passando (20/22)

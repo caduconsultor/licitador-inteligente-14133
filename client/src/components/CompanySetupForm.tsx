@@ -236,12 +236,12 @@ export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
                 <h3 className="font-semibold text-sm">1. Buscar Dados via CNPJ</h3>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <FormField
                     control={form.control}
                     name="cnpj"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="flex-1 w-full">
                         <FormLabel>CNPJ</FormLabel>
                         <FormControl>
                           <Input
@@ -263,7 +263,7 @@ export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
                     type="button"
                     onClick={handleManualSearch}
                     disabled={cnpjStatus === "searching" || form.getValues("cnpj").length < 14 || cnpjStatus === "invalid"}
-                    className="mt-8"
+                    className="mt-8 sm:mt-8 w-full sm:w-auto"
                     variant="outline"
                   >
                     {cnpjStatus === "searching" ? (
@@ -292,7 +292,7 @@ export function CompanySetupForm({ onSuccess }: { onSuccess?: () => void }) {
                 {cnpjData && cnpjStatus === "found" && (
                   <div className="p-3 bg-green-50 border border-green-200 rounded-md space-y-2">
                     <p className="text-sm font-semibold text-green-900">Dados Encontrados:</p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-green-800">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-green-800">
                       <div>
                         <p className="font-semibold">Razão Social:</p>
                         <p>{cnpjData.name}</p>
