@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { getCompanyByUserId, upsertCompany } from "./db";
+import { getCompanyByUserId, getCompaniesByUserId, upsertCompany } from "./db";
 import { InsertCompany } from "../drizzle/schema";
 import { tendersRouter } from "./procedures/tenders";
 import { documentsRouter } from "./procedures/documents";
@@ -37,6 +37,10 @@ export const appRouter = router({
   company: router({
     getProfile: protectedProcedure.query(async ({ ctx }) => {
       return await getCompanyByUserId(ctx.user.id);
+    }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await getCompaniesByUserId(ctx.user.id);
     }),
 
     searchCNPJ: publicProcedure
@@ -90,7 +94,6 @@ export const appRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         const company: InsertCompany = {
-          userId: ctx.user.id,
           cnpj: input.cnpj,
           companyName: input.companyName,
           legalName: input.legalName,
@@ -109,7 +112,7 @@ export const appRouter = router({
           logoUrl: input.logoUrl,
         };
 
-        await upsertCompany(company);
+        await upsertCompany(company, ctx.user.id);
         return { success: true };
       }),
   }),

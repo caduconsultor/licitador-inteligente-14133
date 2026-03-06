@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, cnpj, companyName, createdAt FROM companies ORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user GmPdTyFMXXCAx2J.root --database jXsgxnn8Xq6EfJj32hpRqr --execute SELECT id, cnpj, companyName, createdAt FROM companies ORDER BY createdAt DESC;",
+  "rows": [
+    {
+      "id": "30001",
+      "cnpj": "15558847000163",
+      "companyName": "CONSTRUTORA BRAZIL LTDA",
+      "createdAt": "2026-03-04 00:49:29"
+    },
+    {
+      "id": "1",
+      "cnpj": "44654365000105",
+      "companyName": "CS VIDRACARIA LTDA",
+      "createdAt": "2026-02-18 21:05:51"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcnpj\tcompanyName\tcreatedAt\n30001\t15558847000163\tCONSTRUTORA BRAZIL LTDA\t2026-03-04 00:49:29\n1\t44654365000105\tCS VIDRACARIA LTDA\t2026-02-18 21:05:51\n",
+  "stderr": "",
+  "execution_time_ms": 359
+}

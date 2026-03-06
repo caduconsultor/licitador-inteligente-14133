@@ -25,6 +25,8 @@ export const dashboardRouter = {
     // Editais com prazos críticos (próximos 7 dias)
     const now = new Date();
     const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const nowString = now.toISOString();
+    const sevenDaysLaterString = sevenDaysLater.toISOString();
 
     const criticalTenders = await db
       .select({
@@ -37,14 +39,16 @@ export const dashboardRouter = {
       .where(
         and(
           eq(tenders.userId, ctx.user.id),
-          gte(tenders.deadlineSubmission, now),
-          lte(tenders.deadlineSubmission, sevenDaysLater)
+          sql`${tenders.deadlineSubmission} >= ${nowString}`,
+          sql`${tenders.deadlineSubmission} <= ${sevenDaysLaterString}`
         )
       )
       .orderBy(tenders.deadlineSubmission);
 
     // Documentos vencidos ou próximos de vencer
     const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const nowDateString = now.toISOString().split('T')[0];
+    const thirtyDaysLaterDateString = thirtyDaysLater.toISOString().split('T')[0];
 
     const expiringDocuments = await db
       .select({
@@ -56,14 +60,15 @@ export const dashboardRouter = {
       .where(
         and(
           eq(documents.userId, ctx.user.id),
-          gte(documents.expirationDate, now),
-          lte(documents.expirationDate, thirtyDaysLater)
+          sql`${documents.expirationDate} >= ${nowDateString}`,
+          sql`${documents.expirationDate} <= ${thirtyDaysLaterDateString}`
         )
       )
       .orderBy(documents.expirationDate);
 
     // Propostas geradas (últimos 30 dias)
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgoString = thirtyDaysAgo.toISOString();
 
     const recentProposals = await db
       .select({
@@ -76,7 +81,7 @@ export const dashboardRouter = {
       .where(
         and(
           eq(proposals.userId, ctx.user.id),
-          gte(proposals.createdAt, thirtyDaysAgo)
+          sql`${proposals.createdAt} >= ${thirtyDaysAgoString}`
         )
       )
       .orderBy(proposals.createdAt)
@@ -122,6 +127,7 @@ export const dashboardRouter = {
 
     const lastSixMonths = new Date();
     lastSixMonths.setMonth(lastSixMonths.getMonth() - 6);
+    const lastSixMonthsString = lastSixMonths.toISOString();
 
     const timeline = await db
       .select({
@@ -132,7 +138,7 @@ export const dashboardRouter = {
       .where(
         and(
           eq(tenders.userId, ctx.user.id),
-          gte(tenders.createdAt, lastSixMonths)
+          sql`${tenders.createdAt} >= ${lastSixMonthsString}`
         )
       )
       .groupBy(sql`DATE_FORMAT(createdAt, '%Y-%m')`)

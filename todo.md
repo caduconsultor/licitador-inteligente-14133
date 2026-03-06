@@ -1,295 +1,182 @@
-# Licitador Inteligente 14.133 - TODO
+# Licitador Inteligente - TODO (Opção B: Arquitetura Robusta)
 
-## Fase 1: Análise e Planejamento
-- [x] Pesquisa sobre Lei 14.133/2021 e requisitos de licitações públicas
-- [x] Definição da arquitetura de banco de dados
-- [x] Planejamento da estrutura de pastas e componentes
+## 🎯 Objetivo Geral
+Sistema robusto para consultores gerenciarem múltiplas empresas, seus editais e gerar propostas/declarações automaticamente.
 
-## Fase 2: Banco de Dados e Schema
-- [x] Criar tabelas: companies, tenders, products, suppliers, documents, proposals, declarations
-- [x] Configurar relacionamentos e índices
-- [x] Implementar migrations com Drizzle
+## 📋 Status Geral
+- **Abordagem:** Opção B - Reconstrução com arquitetura robusta
+- **Prioridade:** Múltiplas empresas + Editais associados
+- **Começar:** Do zero (sem dados antigos)
+- **Checkpoints:** A cada fase consolidada
+- **GitHub:** https://github.com/caduconsultor/licitador-inteligente-14133
 
-## Fase 3: Autenticação e Dashboard
-- [x] Integrar OAuth Manus
-- [x] Criar layout principal com sidebar (DashboardLayout)
-- [x] Implementar dashboard com widgets de prazos, propostas e alertas
-- [ ] Criar página de onboarding para novo usuário
+---
 
-## Fase 4: Cadastro da Empresa
-- [ ] Formulário de cadastro de CNPJ com busca automática de dados
-- [ ] Campos de regime tributário, percentual de impostos, dados bancários
-- [ ] Upload de logomarca e representante legal
-- [ ] Página de edição de dados da empresa
+## FASE 1: Redesenho do Schema ⏳
 
-## Fase 5: Gestão de Documentos
-- [ ] Sistema de upload de documentos em nuvem (S3)
-- [ ] Cadastro de data de validade
-- [ ] Alertas de vencimento por e-mail
-- [ ] Download múltiplo em PDF único
-- [ ] Checklist dinâmico de documentos exigidos
+### Problemas do Schema Atual
+- [ ] Associação 1:1 entre usuário e empresa (precisa ser N:N)
+- [ ] Tipos de data inconsistentes (Date vs string)
+- [ ] Editais não associados a empresas
+- [ ] Falta de relacionamentos claros
 
-## Fase 6: Upload e Análise de Editais
-- [ ] Interface de upload de PDF/Word
-- [ ] Integração com IA para extração de informações
-- [ ] Extração de: objeto, prazos, requisitos, critérios, itens/lotes
-- [ ] Armazenamento de editais analisados
-- [ ] Visualização de análise de risco e prazos
+### Tarefas
+- [ ] Analisar schema atual
+- [ ] Redesenhar tabelas:
+  - companies (sem userId, será associado via user_companies)
+  - user_companies (tabela de junção)
+  - tenders (adicionar companyId)
+  - proposals (adicionar companyId)
+  - declarations (adicionar companyId)
+- [ ] Padronizar tipos de data (usar TIMESTAMP para tudo)
+- [ ] Criar índices para performance
+- [ ] Documentar novo schema
 
-## Fase 7: Calculadora de Precificação (Produtos)
-- [ ] Formulário de entrada de produtos
-- [ ] Cálculo automático de custos, impostos, margem
-- [ ] Distribuição de frete por peso/valor
-- [ ] Resumo financeiro
+### Checkpoint 1
+- [ ] Schema redesenhado e validado
+- [ ] Sem erros de tipo de data
+- [ ] Relacionamentos claros
 
-## Fase 8: Calculadora de Serviços/Obras (BDI)
-- [ ] Formulário específico para serviços
-- [ ] Cálculo de BDI (Benefícios e Despesas Indiretas)
-- [ ] Geração de planilha de custos detalhada
-- [ ] Relatório BDI exportável
+---
 
-## Fase 9: Gerador de Propostas e Declarações
-- [ ] Gerador de propostas em PDF timbrado (normas ABNT)
-- [ ] Gerador de declarações padrão Lei 14.133/2021
-- [ ] Criação de declarações manuais
-- [ ] Preenchimento automático de dados da empresa
+## FASE 2: Limpeza e Migrações ⏳
 
-## Fase 10: Gerenciador de Produtos e Fornecedores
-- [ ] Cadastro manual de produtos
-- [ ] Importação de produtos via planilha
-- [ ] Cadastro de fornecedores
-- [ ] Busca e autocomplete de produtos
+### Tarefas
+- [ ] Deletar dados antigos (começar do zero)
+- [ ] Executar migrações sem erros
+- [ ] Validar integridade do banco
+- [ ] Testar conexão com banco
 
-## Fase 11: Testes e Refinamentos
-- [x] Testes unitários com Vitest (auth.integration.test.ts - 8/8 passando)
-- [x] Testes de integração (autenticação, logout, redirect)
-- [ ] Otimizações de performance
-- [ ] Validação de conformidade com Lei 14.133/2021
+### Checkpoint 2
+- [ ] Banco limpo e pronto
+- [ ] Migrações executadas com sucesso
+- [ ] Sem erros de schema
 
-## Fase 12: Entrega Final
-- [ ] Documentação do sistema
-- [ ] Checkpoint final
-- [ ] Apresentação ao usuário
+---
 
-## Fase 5: Cadastro da Empresa e Gestao de Documentos
-- [x] Criar procedimento tRPC para busca de CNPJ via API ReceitaWS
-- [x] Validar e formatar CNPJ no frontend
-- [x] Desenvolver componente de formulario de cadastro da empresa
-- [ ] Implementar upload de logomarca com S3
-- [x] Criar pagina de configuracao da empresa
-- [ ] Implementar gestao de documentos com controle de validade
-- [ ] Adicionar alertas de vencimento de documentos
-- [x] Criar testes unitarios para procedimentos de empresa
+## FASE 3: Interface de Múltiplas Empresas ⏳
 
+### Tarefas
+- [ ] Criar procedimento `company.list` (listar todas as empresas)
+- [ ] Criar procedimento `company.getById` (obter empresa específica)
+- [ ] Criar seletor de empresa no Dashboard (dropdown)
+- [ ] Atualizar CompanySettings para editar empresa selecionada
+- [ ] Implementar CRUD de empresas (criar, editar, deletar)
+- [ ] Validação de CNPJ em tempo real
+- [ ] Testes unitários
 
-## Fase 6: Upload e Analise de Editais com IA
-- [x] Criar procedimento tRPC para upload de arquivo (PDF/Word)
-- [x] Implementar extração de texto de PDFs
-- [x] Criar procedimento tRPC para análise com IA (LLM)
-- [x] Extrair: objeto, prazos, requisitos, itens/lotes, critérios
-- [x] Salvar análise no banco de dados
-- [x] Criar componente de upload com drag-and-drop
-- [x] Desenvolver página de visualização de editais analisados
-- [x] Criar testes para procedimentos de análise (auth.integration.test.ts)
+### Checkpoint 3
+- [ ] Múltiplas empresas funcionando
+- [ ] Seletor de empresa no Dashboard
+- [ ] CRUD de empresas completo
+- [ ] Testes passando
 
+---
 
-## Fase 6.1: Pagina de Detalhes do Edital
-- [x] Criar componente de visualizacao de requisitos estruturados
-- [x] Implementar checklist dinamico de documentos necessarios
-- [x] Criar pagina TenderDetail.tsx com rota parametrizada
-- [x] Adicionar comparacao entre documentos exigidos e cadastrados
-- [x] Implementar alertas de documentos vencidos ou faltantes
-- [x] Criar testes para componentes de detalhes (auth.integration.test.ts)
+## FASE 4: Associação de Editais a Empresas ⏳
 
+### Tarefas
+- [ ] Adicionar campo `companyId` em tenders
+- [ ] Atualizar procedimento de upload de edital para selecionar empresa
+- [ ] Criar procedimento `tender.listByCompany` (listar editais da empresa)
+- [ ] Atualizar página de Tenders para filtrar por empresa selecionada
+- [ ] Atualizar TenderDetail para mostrar empresa associada
+- [ ] Testes unitários
 
-## Fase 7: Gestao de Documentos da Empresa
-- [x] Criar procedimentos tRPC para upload, listagem e deleção de documentos
-- [x] Implementar upload de arquivos com S3
-- [x] Criar componente de upload de documentos
-- [x] Implementar cálculo automático de validade (180 dias)
-- [x] Criar página de gestão de documentos
-- [x] Adicionar alertas de vencimento (30, 60, 90 dias)
-- [x] Criar testes para procedimentos de documentos (auth.integration.test.ts)
+### Checkpoint 4
+- [ ] Editais associados a empresas
+- [ ] Filtro por empresa funcionando
+- [ ] Testes passando
 
+---
 
-## Fase 8: Calculadora de Precificacao para Produtos
-- [x] Criar procedimentos tRPC para calculo de precificacao
-- [x] Implementar logica de calculo de impostos baseado em regime tributario
-- [x] Criar componente de formulario de entrada de produtos
-- [x] Implementar calculo de margem de lucro
-- [x] Adicionar distribuicao de frete por peso/valor
-- [x] Criar resumo financeiro com breakdown de custos
-- [ ] Implementar persistencia de calculos
-- [x] Criar testes para procedimentos de precificacao (auth.integration.test.ts)
+## FASE 5: Gerador de Propostas Integrado ⏳
 
+### Tarefas
+- [ ] Integrar componente de proposta existente
+- [ ] Adicionar campo `companyId` em proposals
+- [ ] Usar IA para gerar conteúdo de proposta baseado no edital
+- [ ] Salvar propostas no banco
+- [ ] Exportar para PDF
+- [ ] Testes unitários
 
-## Fase 9: Gerador de Propostas em PDF
-- [x] Criar procedimentos tRPC para geracao de propostas
-- [x] Implementar template de proposta com normas ABNT
-- [x] Adicionar dados da empresa (logomarca, endereco, contato)
-- [x] Criar formulario de entrada de itens da proposta
-- [x] Implementar calculo automatico de totais
-- [x] Gerar PDF com ReportLab/WeasyPrint
-- [x] Adicionar assinatura digital ou espaco para assinatura
-- [x] Criar testes para procedimentos de propostas (auth.integration.test.ts)
+### Checkpoint 5
+- [ ] Gerador de propostas funcional
+- [ ] Propostas salvas no banco
+- [ ] PDF exportável
+- [ ] Testes passando
 
+---
 
-## Fase 10: Gerador de Declaracoes Lei 14.133/2021
-- [x] Criar procedimentos tRPC para geracao de declaracoes
-- [x] Implementar templates de declaracoes padrao (juridica, tecnica, fiscal, economica)
-- [x] Adicionar campos dinamicos de preenchimento
-- [x] Implementar geracao de PDF com assinatura
-- [x] Criar interface de seleção de tipo de declaracao
-- [x] Adicionar validacao de dados obrigatorios
-- [ ] Implementar persistencia de declaracoes geradas
-- [x] Criar testes para procedimentos de declaracoes (auth.integration.test.ts)
+## FASE 6: Gerador de Declarações Integrado ⏳
 
+### Tarefas
+- [ ] Integrar componente de declarações existente
+- [ ] Adicionar campo `companyId` em declarations
+- [ ] Gerar declarações automaticamente
+- [ ] Salvar e exportar
+- [ ] Testes unitários
 
-## Fase 11: Dashboard Avancado com Estatisticas
-- [x] Criar procedimentos tRPC para obter estatisticas de editais
-- [x] Implementar calculo de prazos criticos e alertas
-- [x] Criar widgets de resumo (total, por status, vencidos)
-- [x] Adicionar grafico de editais por mes
-- [x] Implementar lista de propostas recentes
-- [x] Criar alertas de documentos vencidos
-- [x] Adicionar metricas de propostas geradas
-- [ ] Implementar filtros e busca no dashboard
+### Checkpoint 6
+- [ ] Gerador de declarações funcional
+- [ ] Declarações salvas no banco
+- [ ] PDF exportável
+- [ ] Testes passando
 
+---
 
-## Fase 12: Gerenciador de Produtos e Fornecedores
-- [x] Criar procedimentos tRPC para CRUD de produtos
-- [x] Implementar procedimento para importação de CSV
-- [x] Criar procedimento para busca e autocomplete de produtos
-- [x] Desenvolver componente de formulário de cadastro de produtos
-- [x] Implementar componente de importação CSV com validação
-- [x] Criar página de gerenciamento de produtos
-- [ ] Implementar busca e filtros na lista de produtos
-- [x] Criar testes para procedimentos de produtos (auth.integration.test.ts)
+## FASE 7: Testes e Validação ⏳
 
+### Tarefas
+- [ ] Testar fluxo completo (empresa -> edital -> proposta -> declaração)
+- [ ] Testar com múltiplas empresas
+- [ ] Validar performance
+- [ ] Corrigir bugs encontrados
+- [ ] Testes de integração
 
-## Fase 13: Integracao de Produtos nas Propostas
-- [x] Criar componente de autocomplete de produtos
-- [x] Integrar busca de produtos na calculadora de precificacao
-- [x] Implementar preenchimento automatico de dados do produto
-- [ ] Adicionar validacao de quantidade e preco
-- [ ] Criar lista de itens selecionados com calculo automatico
-- [ ] Implementar remocao de itens da proposta
-- [ ] Adicionar persistencia de propostas no banco de dados
-- [ ] Criar testes para integracao de produtos
+### Checkpoint 7
+- [ ] Sistema completo testado
+- [ ] Sem bugs críticos
+- [ ] Performance aceitável
 
-## Fase 14: Correção de Bugs Críticos
-- [x] Corrigir loop de autenticação ao clicar no perfil
-- [x] Refatorar useAuth para separar side effects (localStorage) do state
-- [x] Mover localStorage operations de useMemo para useEffect
-- [x] Criar testes de integração para validar fluxo de logout
-- [ ] Testar logout no navegador
-- [ ] Validar que todas as rotas estão funcionando corretamente
-- [ ] Verificar se há erros 404 residuais
+---
 
+## FASE 8: Documentação para Claude ⏳
 
-## Fase 15: Bugs Críticos Encontrados
-- [ ] Página 2 retornando erro 404
-- [ ] Página 1 (Dashboard) não responde a cliques
-- [ ] Funcionalidades de cadastro não funcionam (CNPJ, edital)
-- [ ] Investigar logs de erro do servidor e navegador
-- [ ] Verificar rotas em App.tsx
-- [ ] Validar procedimentos tRPC
+### Tarefas
+- [ ] Documentar arquitetura final
+- [ ] Criar guia de continuação
+- [ ] Organizar repositório
+- [ ] Criar README com instruções
+- [ ] Fazer checkpoint final
 
+### Checkpoint 8
+- [ ] Documentação completa
+- [ ] Repositório organizado
+- [ ] Pronto para transição para Claude
 
-## Fase 15: Bugs Criticos Encontrados e Corrigidos
+---
 
-### Problemas Identificados:
-- Página 2 retornando erro 404 - CORRIGIDO
-- Página 1 (Dashboard) não responde a cliques - CORRIGIDO  
-- Funcionalidades de cadastro não funcionam (CNPJ, edital) - CORRIGIDO
+## 📊 Checkpoints Planejados
 
-### Causas Raiz:
-1. DashboardLayout apontava para /some-path (rota inexistente) em vez de /tenders
-2. Tenders.tsx não estava usando DashboardLayout, causando falta de sidebar
-3. Erro de import (Users icon removido mas referência ainda existia)
+| Checkpoint | Fase | Status | Data |
+|-----------|------|--------|------|
+| 1 | Schema redesenhado | ⏳ | - |
+| 2 | Banco limpo e migrações | ⏳ | - |
+| 3 | Múltiplas empresas | ⏳ | - |
+| 4 | Editais associados | ⏳ | - |
+| 5 | Gerador de propostas | ⏳ | - |
+| 6 | Gerador de declarações | ⏳ | - |
+| 7 | Sistema completo | ⏳ | - |
+| 8 | Documentação final | ⏳ | - |
 
-### Solucoes Implementadas:
-- [x] Corrigido DashboardLayout para apontar para rotas reais
-- [x] Adicionado DashboardLayout ao Tenders.tsx
-- [x] Removido import não utilizado de Users icon
-- [x] Verificado que todas as requisicoes tRPC estao retornando 200 OK
-- [x] Validado que autenticacao esta funcionando corretamente
-- [x] Testes de autenticacao: 8/8 passando
+---
 
-### Status Atual:
-- Dashboard carregando corretamente com sidebar
-- Navegacao entre Dashboard e Editais funcionando
-- Todas as requisicoes tRPC retornando sucesso
-- Usuario autenticado e logout funcionando
+## 📝 Notas Importantes
 
-
-## Fase 16: Melhorias de Acessibilidade
-
-- [x] Adicionar botao "Configurar Empresa" no Dashboard
-- [x] Adicionar item "Configuracoes" no menu lateral
-- [x] Facilitar acesso ao cadastro de CNPJ
-- [x] Validar que navegacao funciona corretamente
-
-
-## Bugs Encontrados
-
-- [ ] Dados de empresa cadastrada nao sao visualizados apos salvamento
-- [ ] Verificar persistencia de dados no banco de dados
-- [ ] Verificar se procedimento getProfile esta retornando dados corretos
-
-
-## Resumo de Correcoes - Dados de Empresa Nao Visualizados
-
-### Problema Identificado:
-Dados de empresa cadastrada nao eram visualizados apos salvamento.
-
-### Causa Raiz:
-Cache de tRPC nao estava sendo invalidado apos upsert. A pagina usava window.location.reload() que recarregava a pagina inteira, mas nao invalidava o cache.
-
-### Solucao Implementada:
-1. Adicionado utils.company.getProfile.invalidate() em CompanySetupForm.tsx
-2. Adicionado utils.company.getProfile.invalidate() em CompanySettings.tsx  
-3. Removido window.location.reload() em favor de invalidacao de cache
-4. Agora os dados sao atualizados automaticamente apos o cadastro
-
-### Status:
-- [x] Dados salvos corretamente no banco de dados
-- [x] Procedimento getProfile retorna dados corretos
-- [x] Cache invalidado apos upsert
-- [x] Dados visualizados imediatamente apos cadastro
-- [x] Testes de autenticacao passando (9/9)
-
-
-## Fase 17: Validacao em Tempo Real do Formulario de CNPJ
-
-- [ ] Implementar validacao de formato CNPJ em tempo real
-- [ ] Implementar busca automatica de dados da empresa
-- [ ] Adicionar feedback visual (loading, success, error)
-- [ ] Mostrar dados da empresa encontrada
-- [ ] Validar e testar todas as validacoes
-- [ ] Criar testes unitarios para validacoes
-
-
-### Melhorias Implementadas em Validacao em Tempo Real:
-- [x] Validacao de CNPJ usando algoritmo de checksum
-- [x] Busca automatica apos 500ms de inatividade
-- [x] Feedback visual com icones (valido, invalido, buscando, encontrado)
-- [x] Exibicao de dados encontrados em card verde
-- [x] Desabilitacao de botao de busca quando CNPJ invalido
-- [x] Bordas coloridas no input (verde para valido, vermelho para invalido)
-- [x] 9/9 testes de validacao CNPJ passando
-- [x] 20/22 testes totais passando
-
-
-## Bugs Encontrados - Responsividade
-
-- [x] Formulario de CNPJ nao exibe dados corretamente em smartphone
-- [x] Verificar se ha problema de layout em dispositivos moveis
-- [x] Testar responsividade do CompanySetupForm
-
-### Melhorias de Responsividade Implementadas:
-- [x] Layout flex-col em mobile, flex-row em desktop para botao de busca
-- [x] Input com width full em mobile
-- [x] Grid de dados encontrados com 1 coluna em mobile, 2 em desktop
-- [x] Botao de busca com width full em mobile
-- [x] Todos os testes continuam passando (20/22)
+- Começar do zero (sem dados antigos)
+- Prioridade: Múltiplas empresas + Editais associados
+- Fazer checkpoints frequentes para transição para Claude
+- Manter GitHub sincronizado após cada checkpoint
+- Usar tipos de data consistentes (TIMESTAMP)
+- Testes unitários obrigatórios para cada fase

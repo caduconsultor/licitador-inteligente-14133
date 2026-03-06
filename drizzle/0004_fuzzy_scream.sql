@@ -1,0 +1,1 @@
+ALTER TABLE `companies` DROP INDEX `companies_cnpj_unique`;

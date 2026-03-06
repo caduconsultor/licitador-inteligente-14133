@@ -1,184 +1,218 @@
-import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, date, longtext, json } from "drizzle-orm/mysql-core";
+import { mysqlTable, int, varchar, text, longtext, timestamp, decimal, mysqlEnum, date, json, index } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm"
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
+// ============================================================================
+// USERS TABLE
+// ============================================================================
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
-  id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
-  name: text("name"),
-  email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+	id: int().autoincrement().primaryKey().notNull(),
+	openId: varchar({ length: 64 }).notNull().unique(),
+	name: text(),
+	email: varchar({ length: 320 }),
+	loginMethod: varchar({ length: 64 }),
+	role: mysqlEnum(['user','admin']).default('user').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	lastSignedIn: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
+// ============================================================================
+// COMPANIES TABLE (sem userId - associação via user_companies)
+// ============================================================================
+export const companies = mysqlTable("companies", {
+	id: int().autoincrement().primaryKey().notNull(),
+	cnpj: varchar({ length: 18 }).notNull(),
+	companyName: text().notNull(),
+	legalName: text(),
+	taxRegime: mysqlEnum(['simples_nacional','lucro_presumido','lucro_real']).notNull(),
+	taxPercentage: decimal({ precision: 5, scale: 2 }).notNull(),
+	bankingData: json(),
+	legalRepresentative: json(),
+	logoUrl: varchar({ length: 512 }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("companies_cnpj_idx").on(table.cnpj),
+]);
+
+// ============================================================================
+// USER_COMPANIES TABLE (Associação N:N entre users e companies)
+// ============================================================================
+export const userCompanies = mysqlTable("user_companies", {
+	id: int().autoincrement().primaryKey().notNull(),
+	userId: int().notNull(),
+	companyId: int().notNull(),
+	role: mysqlEnum(['owner','editor','viewer']).default('owner').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+},
+(table) => [
+	index("user_companies_userId_idx").on(table.userId),
+	index("user_companies_companyId_idx").on(table.companyId),
+]);
+
+// ============================================================================
+// TENDERS TABLE (Editais - associados a companies)
+// ============================================================================
+export const tenders = mysqlTable("tenders", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	title: varchar({ length: 512 }).notNull(),
+	description: longtext(),
+	fileUrl: varchar({ length: 512 }).notNull(),
+	fileName: varchar({ length: 255 }).notNull(),
+	fileType: varchar({ length: 50 }),
+	tenderObject: longtext(),
+	deadlineSubmission: timestamp({ mode: 'string' }),
+	deadlineOpening: timestamp({ mode: 'string' }),
+	deadlineAnalysis: timestamp({ mode: 'string' }),
+	habilitationRequirements: json(),
+	judgmentCriteria: varchar({ length: 255 }),
+	estimatedValue: decimal({ precision: 15, scale: 2 }),
+	items: json(),
+	analysisStatus: mysqlEnum(['pending','analyzing','completed','error']).default('pending'),
+	analysisResult: longtext(),
+	riskLevel: mysqlEnum(['low','medium','high']),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("tenders_companyId_idx").on(table.companyId),
+]);
+
+// ============================================================================
+// DOCUMENTS TABLE (Documentos da empresa)
+// ============================================================================
+export const documents = mysqlTable("documents", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	documentType: varchar({ length: 100 }),
+	fileUrl: varchar({ length: 512 }).notNull(),
+	fileName: varchar({ length: 255 }).notNull(),
+	expirationDate: timestamp({ mode: 'string' }),
+	daysUntilExpiration: int(),
+	isExpired: int().default(0),
+	alertSent: int().default(0),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("documents_companyId_idx").on(table.companyId),
+]);
+
+// ============================================================================
+// PRODUCTS TABLE (Produtos da empresa)
+// ============================================================================
+export const products = mysqlTable("products", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	name: text().notNull(),
+	brand: varchar({ length: 255 }),
+	model: varchar({ length: 255 }),
+	unit: varchar({ length: 50 }),
+	cost: decimal({ precision: 15, scale: 2 }).notNull(),
+	supplierId: int(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("products_companyId_idx").on(table.companyId),
+]);
+
+// ============================================================================
+// SUPPLIERS TABLE (Fornecedores da empresa)
+// ============================================================================
+export const suppliers = mysqlTable("suppliers", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	name: text().notNull(),
+	cnpj: varchar({ length: 18 }),
+	phone: varchar({ length: 20 }),
+	whatsapp: varchar({ length: 20 }),
+	email: varchar({ length: 320 }),
+	rating: decimal({ precision: 3, scale: 2 }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("suppliers_companyId_idx").on(table.companyId),
+]);
+
+// ============================================================================
+// PROPOSALS TABLE (Propostas - associadas a companies e tenders)
+// ============================================================================
+export const proposals = mysqlTable("proposals", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	tenderId: int(),
+	title: text().notNull(),
+	proposalType: mysqlEnum(['products','services','works']).notNull(),
+	processNumber: varchar({ length: 100 }),
+	validityDate: timestamp({ mode: 'string' }),
+	paymentDate: timestamp({ mode: 'string' }),
+	city: varchar({ length: 255 }),
+	deliveryDeadline: int(),
+	items: json(),
+	freight: decimal({ precision: 15, scale: 2 }),
+	totalCost: decimal({ precision: 15, scale: 2 }),
+	totalSale: decimal({ precision: 15, scale: 2 }),
+	observations: longtext(),
+	pdfUrl: varchar({ length: 512 }),
+	status: mysqlEnum(['draft','ready','submitted','won','lost']).default('draft'),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("proposals_companyId_idx").on(table.companyId),
+	index("proposals_tenderId_idx").on(table.tenderId),
+]);
+
+// ============================================================================
+// DECLARATIONS TABLE (Declarações - associadas a companies e proposals)
+// ============================================================================
+export const declarations = mysqlTable("declarations", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	proposalId: int(),
+	title: text().notNull(),
+	content: longtext().notNull(),
+	isStandard: int().default(0),
+	pdfUrl: varchar({ length: 512 }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("declarations_companyId_idx").on(table.companyId),
+	index("declarations_proposalId_idx").on(table.proposalId),
+]);
+
+// ============================================================================
+// TYPE EXPORTS
+// ============================================================================
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
-
-// ============================================
-// COMPANY & PROFILE TABLES
-// ============================================
-
-export const companies = mysqlTable("companies", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  cnpj: varchar("cnpj", { length: 18 }).notNull().unique(),
-  companyName: text("companyName").notNull(),
-  legalName: text("legalName"),
-  taxRegime: mysqlEnum("taxRegime", ["simples_nacional", "lucro_presumido", "lucro_real"]).notNull(),
-  taxPercentage: decimal("taxPercentage", { precision: 5, scale: 2 }).notNull(),
-  bankingData: json("bankingData"), // { bank, agency, account, accountType }
-  legalRepresentative: json("legalRepresentative"), // { name, cpf, position }
-  logoUrl: varchar("logoUrl", { length: 512 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
 
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = typeof companies.$inferInsert;
 
-// ============================================
-// TENDERS (EDITAIS)
-// ============================================
-
-export const tenders = mysqlTable("tenders", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  title: text("title").notNull(),
-  description: longtext("description"),
-  fileUrl: varchar("fileUrl", { length: 512 }).notNull(),
-  fileName: varchar("fileName", { length: 255 }).notNull(),
-  fileType: varchar("fileType", { length: 50 }), // pdf, docx, etc
-  tenderObject: longtext("tenderObject"), // Objeto da licitação
-  deadlineSubmission: timestamp("deadlineSubmission"),
-  deadlineOpening: timestamp("deadlineOpening"),
-  deadlineAnalysis: timestamp("deadlineAnalysis"),
-  habilitationRequirements: json("habilitationRequirements"), // { juridical, technical, fiscal, economic }
-  judgmentCriteria: varchar("judgmentCriteria", { length: 255 }), // menor_preco, melhor_tecnica, etc
-  estimatedValue: decimal("estimatedValue", { precision: 15, scale: 2 }),
-  items: json("items"), // Array of items/lots
-  analysisStatus: mysqlEnum("analysisStatus", ["pending", "analyzing", "completed", "error"]).default("pending"),
-  analysisResult: longtext("analysisResult"), // JSON with extracted info
-  riskLevel: mysqlEnum("riskLevel", ["low", "medium", "high"]),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+export type UserCompany = typeof userCompanies.$inferSelect;
+export type InsertUserCompany = typeof userCompanies.$inferInsert;
 
 export type Tender = typeof tenders.$inferSelect;
 export type InsertTender = typeof tenders.$inferInsert;
 
-// ============================================
-// PRODUCTS & SUPPLIERS
-// ============================================
-
-export const products = mysqlTable("products", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  name: text("name").notNull(),
-  brand: varchar("brand", { length: 255 }),
-  model: varchar("model", { length: 255 }),
-  unit: varchar("unit", { length: 50 }), // un, kg, m, etc
-  cost: decimal("cost", { precision: 15, scale: 2 }).notNull(),
-  supplierId: int("supplierId"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = typeof documents.$inferInsert;
 
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = typeof products.$inferInsert;
 
-export const suppliers = mysqlTable("suppliers", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  name: text("name").notNull(),
-  cnpj: varchar("cnpj", { length: 18 }),
-  phone: varchar("phone", { length: 20 }),
-  whatsapp: varchar("whatsapp", { length: 20 }),
-  email: varchar("email", { length: 320 }),
-  rating: decimal("rating", { precision: 3, scale: 2 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
 export type Supplier = typeof suppliers.$inferSelect;
 export type InsertSupplier = typeof suppliers.$inferInsert;
 
-// ============================================
-// PROPOSALS
-// ============================================
-
-export const proposals = mysqlTable("proposals", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  tenderId: int("tenderId"),
-  title: text("title").notNull(),
-  proposalType: mysqlEnum("proposalType", ["products", "services", "works"]).notNull(),
-  processNumber: varchar("processNumber", { length: 100 }),
-  validityDate: date("validityDate"),
-  paymentDate: date("paymentDate"),
-  city: varchar("city", { length: 255 }),
-  deliveryDeadline: int("deliveryDeadline"), // days
-  items: json("items"), // Array of proposal items
-  freight: decimal("freight", { precision: 15, scale: 2 }),
-  totalCost: decimal("totalCost", { precision: 15, scale: 2 }),
-  totalSale: decimal("totalSale", { precision: 15, scale: 2 }),
-  observations: longtext("observations"),
-  pdfUrl: varchar("pdfUrl", { length: 512 }),
-  status: mysqlEnum("status", ["draft", "ready", "submitted", "won", "lost"]).default("draft"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
 export type Proposal = typeof proposals.$inferSelect;
 export type InsertProposal = typeof proposals.$inferInsert;
-
-// ============================================
-// DOCUMENTS
-// ============================================
-
-export const documents = mysqlTable("documents", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  name: varchar("name", { length: 255 }).notNull(),
-  documentType: varchar("documentType", { length: 100 }), // cnpj, certidao, atestado, etc
-  fileUrl: varchar("fileUrl", { length: 512 }).notNull(),
-  fileName: varchar("fileName", { length: 255 }).notNull(),
-  expirationDate: date("expirationDate"),
-  daysUntilExpiration: int("daysUntilExpiration"),
-  isExpired: boolean("isExpired").default(false),
-  alertSent: boolean("alertSent").default(false),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Document = typeof documents.$inferSelect;
-export type InsertDocument = typeof documents.$inferInsert;
-
-// ============================================
-// DECLARATIONS
-// ============================================
-
-export const declarations = mysqlTable("declarations", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  proposalId: int("proposalId"),
-  title: text("title").notNull(),
-  content: longtext("content").notNull(),
-  isStandard: boolean("isStandard").default(false),
-  pdfUrl: varchar("pdfUrl", { length: 512 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
 
 export type Declaration = typeof declarations.$inferSelect;
 export type InsertDeclaration = typeof declarations.$inferInsert;

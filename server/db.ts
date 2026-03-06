@@ -1,6 +1,6 @@
 import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, companies, InsertCompany, tenders, products, documents, proposals } from "../drizzle/schema";
+import { InsertUser, users, companies, InsertCompany, tenders, products, documents, proposals, userCompanies, InsertUserCompany } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -93,37 +93,87 @@ export async function getUserByOpenId(openId: string) {
 // COMPANY QUERIES
 // ============================================
 
-export async function getCompanyByUserId(userId: number) {
+export async function getCompanyById(companyId: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(companies).where(eq(companies.userId, userId)).limit(1);
+  const result = await db.select().from(companies).where(eq(companies.id, companyId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function upsertCompany(data: InsertCompany) {
+export async function getCompaniesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get all companies associated with this user via user_companies table
+  const result = await db
+    .select({ company: companies })
+    .from(companies)
+    .innerJoin(userCompanies, eq(companies.id, userCompanies.companyId))
+    .where(eq(userCompanies.userId, userId));
+  
+  return result.map(r => r.company);
+}
+
+export async function getCompanyByUserId(userId: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.insert(companies).values(data).onDuplicateKeyUpdate({
-    set: {
-      companyName: data.companyName,
-      taxRegime: data.taxRegime,
-      taxPercentage: data.taxPercentage,
-      bankingData: data.bankingData,
-      legalRepresentative: data.legalRepresentative,
-      logoUrl: data.logoUrl,
-    },
-  });
-  return result;
+  
+  // Get the first company associated with this user
+  const result = await db
+    .select({ company: companies })
+    .from(companies)
+    .innerJoin(userCompanies, eq(companies.id, userCompanies.companyId))
+    .where(eq(userCompanies.userId, userId))
+    .limit(1);
+  
+  return result.length > 0 ? result[0].company : undefined;
+}
+
+export async function upsertCompany(data: InsertCompany, userId?: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  try {
+    // Insert or update the company
+    const result = await db.insert(companies).values(data).onDuplicateKeyUpdate({
+      set: {
+        companyName: data.companyName,
+        taxRegime: data.taxRegime,
+        taxPercentage: data.taxPercentage,
+        bankingData: data.bankingData,
+        legalRepresentative: data.legalRepresentative,
+        logoUrl: data.logoUrl,
+      },
+    });
+    
+    // If userId is provided, associate the company with the user
+    if (userId && result.insertId) {
+      const userCompanyData: InsertUserCompany = {
+        userId,
+        companyId: Number(result.insertId),
+        role: 'owner',
+      };
+      
+      await db.insert(userCompanies).values(userCompanyData).onDuplicateKeyUpdate({
+        set: { role: 'owner' },
+      });
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to upsert company:", error);
+    throw error;
+  }
 }
 
 // ============================================
 // TENDER QUERIES
 // ============================================
 
-export async function getUserTenders(userId: number) {
+export async function getCompanyTenders(companyId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(tenders).where(eq(tenders.userId, userId)).orderBy(desc(tenders.createdAt));
+  return await db.select().from(tenders).where(eq(tenders.companyId, companyId)).orderBy(desc(tenders.createdAt));
 }
 
 export async function getTenderById(id: number) {
@@ -137,36 +187,36 @@ export async function getTenderById(id: number) {
 // PRODUCT QUERIES
 // ============================================
 
-export async function getUserProducts(userId: number) {
+export async function getCompanyProducts(companyId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(products).where(eq(products.userId, userId)).orderBy(desc(products.createdAt));
+  return await db.select().from(products).where(eq(products.companyId, companyId)).orderBy(desc(products.createdAt));
 }
 
 // ============================================
 // DOCUMENT QUERIES
 // ============================================
 
-export async function getUserDocuments(userId: number) {
+export async function getCompanyDocuments(companyId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(documents).where(eq(documents.userId, userId)).orderBy(desc(documents.createdAt));
+  return await db.select().from(documents).where(eq(documents.companyId, companyId)).orderBy(desc(documents.createdAt));
 }
 
-export async function getExpiredDocuments(userId: number) {
+export async function getExpiredDocuments(companyId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(documents).where(and(eq(documents.userId, userId), eq(documents.isExpired, true)));
+  return await db.select().from(documents).where(and(eq(documents.companyId, companyId), eq(documents.isExpired, 1)));
 }
 
 // ============================================
 // PROPOSAL QUERIES
 // ============================================
 
-export async function getUserProposals(userId: number) {
+export async function getCompanyProposals(companyId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(proposals).where(eq(proposals.userId, userId)).orderBy(desc(proposals.createdAt));
+  return await db.select().from(proposals).where(eq(proposals.companyId, companyId)).orderBy(desc(proposals.createdAt));
 }
 
 export async function getProposalById(id: number) {
@@ -175,5 +225,3 @@ export async function getProposalById(id: number) {
   const result = await db.select().from(proposals).where(eq(proposals.id, id)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
-
-

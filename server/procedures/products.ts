@@ -3,12 +3,14 @@ import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { products, suppliers } from "../../drizzle/schema";
 import { eq, like, and } from "drizzle-orm";
+import { getCompaniesByUserId } from "../db";
 
 export const productsRouter = {
   // Criar novo produto
   create: protectedProcedure
     .input(
       z.object({
+        companyId: z.number(),
         name: z.string().min(1, "Nome do produto é obrigatório"),
         brand: z.string().optional(),
         model: z.string().optional(),
@@ -22,7 +24,7 @@ export const productsRouter = {
       if (!db) throw new Error("Database not available");
 
       await db.insert(products).values({
-        userId: ctx.user.id,
+        companyId: input.companyId,
         name: input.name,
         brand: input.brand,
         model: input.model,
@@ -35,22 +37,24 @@ export const productsRouter = {
     }),
 
   // Listar produtos do usuário
-  list: protectedProcedure.query(async ({ ctx }) => {
-    const db = await getDb();
-    if (!db) throw new Error("Database not available");
+  list: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
 
-    const result = await db
-      .select()
-      .from(products)
-      .where(eq(products.userId, ctx.user.id))
-      .orderBy(products.name);
+      const result = await db
+        .select()
+        .from(products)
+        .where(eq(products.companyId, input.companyId))
+        .orderBy(products.name);
 
-    return result;
-  }),
+      return result;
+    }),
 
   // Buscar produtos com autocomplete
   search: protectedProcedure
-    .input(z.object({ query: z.string().min(1) }))
+    .input(z.object({ companyId: z.number(), query: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
@@ -60,7 +64,7 @@ export const productsRouter = {
         .from(products)
         .where(
           and(
-            eq(products.userId, ctx.user.id),
+            eq(products.companyId, input.companyId),
             like(products.name, `%${input.query}%`)
           )
         )
@@ -74,6 +78,7 @@ export const productsRouter = {
     .input(
       z.object({
         id: z.number(),
+        companyId: z.number(),
         name: z.string().optional(),
         brand: z.string().optional(),
         model: z.string().optional(),
@@ -180,24 +185,27 @@ export const suppliersRouter = {
     }),
 
   // Listar fornecedores
-  list: protectedProcedure.query(async ({ ctx }) => {
-    const db = await getDb();
-    if (!db) throw new Error("Database not available");
+  list: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
 
-    const result = await db
-      .select()
-      .from(suppliers)
-      .where(eq(suppliers.userId, ctx.user.id))
-      .orderBy(suppliers.name);
+      const result = await db
+        .select()
+        .from(suppliers)
+        .where(eq(suppliers.companyId, input.companyId))
+        .orderBy(suppliers.name);
 
-    return result;
-  }),
+      return result;
+    }),
 
   // Atualizar fornecedor
   update: protectedProcedure
     .input(
       z.object({
         id: z.number(),
+        companyId: z.number(),
         name: z.string().optional(),
         cnpj: z.string().optional(),
         phone: z.string().optional(),
@@ -221,21 +229,21 @@ export const suppliersRouter = {
       await db
         .update(suppliers)
         .set(updateData)
-        .where(and(eq(suppliers.id, input.id), eq(suppliers.userId, ctx.user.id)));
+        .where(and(eq(suppliers.id, input.id), eq(suppliers.companyId, input.companyId)));
 
       return { success: true };
     }),
 
   // Deletar fornecedor
   delete: protectedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.number(), companyId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
       await db
         .delete(suppliers)
-        .where(and(eq(suppliers.id, input.id), eq(suppliers.userId, ctx.user.id)));
+        .where(and(eq(suppliers.id, input.id), eq(suppliers.companyId, input.companyId)));
 
       return { success: true };
     }),

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { storagePut } from "../storage";
 import { getDb } from "../db";
 import { documents } from "../../drizzle/schema";
-import { eq, and, lte } from "drizzle-orm";
+import { eq, and, lte, sql } from "drizzle-orm";
 
 export const documentsRouter = router({
   uploadDocument: protectedProcedure
@@ -148,7 +148,7 @@ export const documentsRouter = router({
 
         await database
           .update(documents)
-          .set({ expirationDate: new Date(input.expirationDate) })
+          .set({ expirationDate: input.expirationDate })
           .where(eq(documents.id, input.id));
 
         return { success: true };
@@ -164,6 +164,7 @@ export const documentsRouter = router({
       if (!database) return [];
 
       const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const thirtyDaysFromNowString = thirtyDaysFromNow.toISOString().split('T')[0];
 
       const result = await database
         .select()
@@ -171,7 +172,7 @@ export const documentsRouter = router({
         .where(
           and(
             eq(documents.userId, ctx.user.id),
-            lte(documents.expirationDate, thirtyDaysFromNow)
+            sql`${documents.expirationDate} <= ${thirtyDaysFromNowString}`
           )
         )
         .orderBy(documents.expirationDate);

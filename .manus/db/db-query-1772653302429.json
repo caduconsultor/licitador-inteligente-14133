@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `tenders` MODIFY COLUMN `title` VARCHAR(512) NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user GmPdTyFMXXCAx2J.root --database jXsgxnn8Xq6EfJj32hpRqr --execute ALTER TABLE `tenders` MODIFY COLUMN `title` VARCHAR(512) NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 713
+}
