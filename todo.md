@@ -180,3 +180,76 @@ Sistema robusto para consultores gerenciarem múltiplas empresas, seus editais e
 - Manter GitHub sincronizado após cada checkpoint
 - Usar tipos de data consistentes (TIMESTAMP)
 - Testes unitários obrigatórios para cada fase
+
+
+---
+
+## FASE 9: Motor de Busca Refinado (Novo Foco - Superar MABUS) 🚀
+
+### Objetivo
+Implementar motor de busca semântico que supere a qualidade do MABUS com busca contextual, categorização automática e filtros inteligentes.
+
+### Fase 9.1: Preparação e Arquitetura
+- [ ] Redesenhar schema para suportar embeddings
+- [ ] Implementar tabela `item_embeddings` (armazena vetores de significado)
+- [ ] Implementar tabela `search_history` (rastreia buscas e resultados)
+- [ ] Criar índices de busca otimizados
+- [ ] Documentar arquitetura de busca semântica
+
+### Fase 9.2: Embeddings e Índices
+- [ ] Integrar API de embeddings (OpenAI, Manus API ou similar)
+- [ ] Gerar embeddings para todos os itens de editais
+- [ ] Criar índices vetoriais para busca rápida (pgvector ou similar)
+- [ ] Implementar cache de embeddings
+- [ ] Testar performance de busca
+
+### Fase 9.3: Motor de Busca Semântica
+- [ ] Implementar busca por similaridade semântica
+- [ ] Busca por contexto (não só palavras-chave)
+- [ ] Ranking de relevância inteligente
+- [ ] Tratamento de sinônimos (Notebook = Laptop = Computador)
+- [ ] Testes de qualidade vs MABUS
+
+### Fase 9.4: Categorização Automática
+- [ ] Classificar itens por categoria automaticamente
+- [ ] Usar IA para categorização inteligente
+- [ ] Manter histórico de categorias
+- [ ] Permitir correção manual de categorias
+- [ ] Testes de precisão de categorização
+
+### Fase 9.5: Limpeza e Normalização
+- [ ] Remover duplicatas de itens
+- [ ] Normalizar nomes de produtos
+- [ ] Corrigir erros de digitação
+- [ ] Padronizar unidades (kg, un, m², etc.)
+- [ ] Testes de qualidade de dados
+
+### Fase 9.6: Filtros Inteligentes
+- [ ] Filtrar por margem de lucro esperada
+- [ ] Filtrar por nível de concorrência
+- [ ] Filtrar por histórico de pagamento da prefeitura
+- [ ] Filtrar por risco de viabilidade
+- [ ] Filtrar por categoria de produto
+- [ ] Testes de filtros
+
+### Fase 9.7: Aprendizado com Histórico
+- [ ] Rastrear buscas que levaram a propostas vencidas
+- [ ] Rastrear buscas que levaram a propostas perdidas
+- [ ] Reforçar padrões de sucesso
+- [ ] Penalizar resultados irrelevantes
+- [ ] Machine Learning simples para melhorar ranking
+- [ ] Testes de melhoria ao longo do tempo
+
+### Fase 9.8: Testes e Otimização
+- [ ] Testar qualidade de busca vs MABUS
+- [ ] Testar com dados reais de editais
+- [ ] Otimizar performance de busca
+- [ ] Validar com usuários reais
+- [ ] Benchmark vs MABUS
+
+### Checkpoint 9
+- [ ] Motor de busca refinado funcional
+- [ ] Qualidade de busca superior ao MABUS
+- [ ] Performance aceitável
+- [ ] Testes passando
+- [ ] Documentação completa

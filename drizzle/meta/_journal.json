@@ -8,6 +8,13 @@
       "when": 1772681603955,
       "tag": "0000_careless_vampiro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1777264575706,
+      "tag": "0001_odd_sugar_man",
+      "breakpoints": true
     }
   ]
 }

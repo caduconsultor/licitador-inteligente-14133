@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, text, longtext, timestamp, decimal, mysqlEnum, date, json, index } from "drizzle-orm/mysql-core";
+import { mysqlTable, int, varchar, text, longtext, timestamp, decimal, mysqlEnum, date, json, index, float } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm"
 
 // ============================================================================
@@ -188,6 +188,68 @@ export const declarations = mysqlTable("declarations", {
 ]);
 
 // ============================================================================
+// ITEM_EMBEDDINGS TABLE (Embeddings semânticos para busca)
+// ============================================================================
+export const itemEmbeddings = mysqlTable("item_embeddings", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	tenderId: int(),
+	itemName: text().notNull(),
+	itemDescription: longtext(),
+	category: varchar({ length: 255 }),
+	embedding: json().notNull(), // Armazena vetor de embeddings (array de floats)
+	similarityScore: float().default(0),
+	isNormalized: int().default(0),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("itemEmbeddings_companyId_idx").on(table.companyId),
+	index("itemEmbeddings_tenderId_idx").on(table.tenderId),
+	index("itemEmbeddings_category_idx").on(table.category),
+]);
+
+// ============================================================================
+// SEARCH_HISTORY TABLE (Rastreia buscas e resultados para aprendizado)
+// ============================================================================
+export const searchHistory = mysqlTable("search_history", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	query: text().notNull(),
+	queryEmbedding: json(), // Embedding da query para análise posterior
+	results: json(), // Array de IDs de resultados retornados
+	selectedResult: int(), // ID do resultado que o usuário selecionou
+	proposalCreated: int().default(0), // 1 se levou a uma proposta
+	proposalWon: int().default(0), // 1 se a proposta foi vencida
+	relevanceRating: int(), // Rating manual de 1-5 da relevância
+	notes: longtext(), // Notas do usuário sobre a busca
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("searchHistory_companyId_idx").on(table.companyId),
+	index("searchHistory_createdAt_idx").on(table.createdAt),
+]);
+
+// ============================================================================
+// ITEM_CATEGORIES TABLE (Categorias de itens para classificação)
+// ============================================================================
+export const itemCategories = mysqlTable("item_categories", {
+	id: int().autoincrement().primaryKey().notNull(),
+	companyId: int().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	description: text(),
+	parentCategoryId: int(), // Para subcategorias
+	isActive: int().default(1),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("itemCategories_companyId_idx").on(table.companyId),
+	index("itemCategories_parentCategoryId_idx").on(table.parentCategoryId),
+]);
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 export type User = typeof users.$inferSelect;
@@ -216,3 +278,12 @@ export type InsertProposal = typeof proposals.$inferInsert;
 
 export type Declaration = typeof declarations.$inferSelect;
 export type InsertDeclaration = typeof declarations.$inferInsert;
+
+export type ItemEmbedding = typeof itemEmbeddings.$inferSelect;
+export type InsertItemEmbedding = typeof itemEmbeddings.$inferInsert;
+
+export type SearchHistory = typeof searchHistory.$inferSelect;
+export type InsertSearchHistory = typeof searchHistory.$inferInsert;
+
+export type ItemCategory = typeof itemCategories.$inferSelect;
+export type InsertItemCategory = typeof itemCategories.$inferInsert;

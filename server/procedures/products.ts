@@ -3,7 +3,6 @@ import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { products, suppliers } from "../../drizzle/schema";
 import { eq, like, and } from "drizzle-orm";
-import { getCompaniesByUserId } from "../db";
 
 export const productsRouter = {
   // Criar novo produto
@@ -102,21 +101,21 @@ export const productsRouter = {
       await db
         .update(products)
         .set(updateData)
-        .where(and(eq(products.id, input.id), eq(products.userId, ctx.user.id)));
+        .where(and(eq(products.id, input.id), eq(products.companyId, input.companyId)));
 
       return { success: true };
     }),
 
   // Deletar produto
   delete: protectedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.number(), companyId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
       await db
         .delete(products)
-        .where(and(eq(products.id, input.id), eq(products.userId, ctx.user.id)));
+        .where(and(eq(products.id, input.id), eq(products.companyId, input.companyId)));
 
       return { success: true };
     }),
@@ -125,6 +124,7 @@ export const productsRouter = {
   importCSV: protectedProcedure
     .input(
       z.object({
+        companyId: z.number(),
         csvData: z.array(
           z.object({
             name: z.string(),
@@ -141,7 +141,7 @@ export const productsRouter = {
       if (!db) throw new Error("Database not available");
 
       const insertData = input.csvData.map((item) => ({
-        userId: ctx.user.id,
+        companyId: input.companyId,
         name: item.name,
         brand: item.brand,
         model: item.model,
@@ -161,6 +161,7 @@ export const suppliersRouter = {
   create: protectedProcedure
     .input(
       z.object({
+        companyId: z.number(),
         name: z.string().min(1, "Nome do fornecedor é obrigatório"),
         cnpj: z.string().optional(),
         phone: z.string().optional(),
@@ -173,7 +174,7 @@ export const suppliersRouter = {
       if (!db) throw new Error("Database not available");
 
       await db.insert(suppliers).values({
-        userId: ctx.user.id,
+        companyId: input.companyId,
         name: input.name,
         cnpj: input.cnpj,
         phone: input.phone,

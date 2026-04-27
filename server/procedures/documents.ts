@@ -8,6 +8,7 @@ import { eq, and, lte, sql } from "drizzle-orm";
 export const documentsRouter = router({
   uploadDocument: protectedProcedure
     .input(z.object({
+      companyId: z.number(),
       fileName: z.string(),
       fileContent: z.string(),
       mimeType: z.string(),
@@ -16,7 +17,7 @@ export const documentsRouter = router({
     }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const fileKey = `documents/${ctx.user.id}/${Date.now()}-${input.fileName}`;
+        const fileKey = `documents/${input.companyId}/${Date.now()}-${input.fileName}`;
         const contentBuffer = Buffer.from(input.fileContent, "base64");
         const { url: fileUrl } = await storagePut(fileKey, contentBuffer, input.mimeType);
 
@@ -33,7 +34,7 @@ export const documentsRouter = router({
         );
 
         const docData = {
-          userId: ctx.user.id,
+          companyId: input.companyId,
           name: input.fileName,
           fileName: input.fileName,
           fileUrl,
@@ -52,7 +53,9 @@ export const documentsRouter = router({
       }
     }),
 
-  listDocuments: protectedProcedure.query(async ({ ctx }) => {
+  listDocuments: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ ctx, input }) => {
     try {
       const database = await getDb();
       if (!database) return [];
@@ -60,7 +63,7 @@ export const documentsRouter = router({
       const result = await database
         .select()
         .from(documents)
-        .where(eq(documents.userId, ctx.user.id))
+        .where(eq(documents.companyId, input.companyId))
         .orderBy(documents.expirationDate);
 
       const now = new Date();
@@ -88,7 +91,7 @@ export const documentsRouter = router({
   }),
 
   getDocument: protectedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.number(), companyId: z.number() }))
     .query(async ({ ctx, input }) => {
       try {
         const database = await getDb();
@@ -97,7 +100,7 @@ export const documentsRouter = router({
         const result = await database
           .select()
           .from(documents)
-          .where(and(eq(documents.id, input.id), eq(documents.userId, ctx.user.id)))
+          .where(and(eq(documents.id, input.id), eq(documents.companyId, input.companyId)))
           .limit(1);
 
         return result[0] || null;
@@ -108,7 +111,7 @@ export const documentsRouter = router({
     }),
 
   deleteDocument: protectedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.number(), companyId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       try {
         const database = await getDb();
@@ -117,7 +120,7 @@ export const documentsRouter = router({
         const result = await database
           .select()
           .from(documents)
-          .where(and(eq(documents.id, input.id), eq(documents.userId, ctx.user.id)))
+          .where(and(eq(documents.id, input.id), eq(documents.companyId, input.companyId)))
           .limit(1);
 
         if (!result[0]) return { success: false };
@@ -132,7 +135,7 @@ export const documentsRouter = router({
     }),
 
   updateExpirationDate: protectedProcedure
-    .input(z.object({ id: z.number(), expirationDate: z.string() }))
+    .input(z.object({ id: z.number(), companyId: z.number(), expirationDate: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
         const database = await getDb();
@@ -141,7 +144,7 @@ export const documentsRouter = router({
         const result = await database
           .select()
           .from(documents)
-          .where(and(eq(documents.id, input.id), eq(documents.userId, ctx.user.id)))
+          .where(and(eq(documents.id, input.id), eq(documents.companyId, input.companyId)))
           .limit(1);
 
         if (!result[0]) return { success: false };
@@ -158,7 +161,9 @@ export const documentsRouter = router({
       }
     }),
 
-  getExpiringDocuments: protectedProcedure.query(async ({ ctx }) => {
+  getExpiringDocuments: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ ctx, input }) => {
     try {
       const database = await getDb();
       if (!database) return [];
@@ -171,7 +176,7 @@ export const documentsRouter = router({
         .from(documents)
         .where(
           and(
-            eq(documents.userId, ctx.user.id),
+            eq(documents.companyId, input.companyId),
             sql`${documents.expirationDate} <= ${thirtyDaysFromNowString}`
           )
         )

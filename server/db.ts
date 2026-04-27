@@ -61,11 +61,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     }
 
     if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+      values.lastSignedIn = new Date().toISOString();
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      updateSet.lastSignedIn = new Date().toISOString();
     }
 
     await db.insert(users).values(values).onDuplicateKeyUpdate({
@@ -147,16 +147,19 @@ export async function upsertCompany(data: InsertCompany, userId?: number) {
     });
     
     // If userId is provided, associate the company with the user
-    if (userId && result.insertId) {
-      const userCompanyData: InsertUserCompany = {
-        userId,
-        companyId: Number(result.insertId),
-        role: 'owner',
-      };
-      
-      await db.insert(userCompanies).values(userCompanyData).onDuplicateKeyUpdate({
-        set: { role: 'owner' },
-      });
+    if (userId) {
+      const companyId = data.id || (result as any).insertId;
+      if (companyId) {
+        const userCompanyData: InsertUserCompany = {
+          userId,
+          companyId: Number(companyId),
+          role: 'owner',
+        };
+        
+        await db.insert(userCompanies).values(userCompanyData).onDuplicateKeyUpdate({
+          set: { role: 'owner' },
+        });
+      }
     }
     
     return result;

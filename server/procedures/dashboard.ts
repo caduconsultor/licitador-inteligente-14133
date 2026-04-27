@@ -5,7 +5,9 @@ import { tenders, documents, proposals } from "../../drizzle/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 export const dashboardRouter = {
-  getStatistics: protectedProcedure.query(async ({ ctx }) => {
+  getStatistics: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ ctx, input }) => {
     const db = await getDb();
     if (!db) {
       throw new Error("Database not available");
@@ -20,7 +22,7 @@ export const dashboardRouter = {
         riskHigh: sql<number>`SUM(CASE WHEN riskLevel = 'high' THEN 1 ELSE 0 END)`,
       })
       .from(tenders)
-      .where(eq(tenders.userId, ctx.user.id));
+      .where(eq(tenders.companyId, input.companyId));
 
     // Editais com prazos críticos (próximos 7 dias)
     const now = new Date();
@@ -38,7 +40,7 @@ export const dashboardRouter = {
       .from(tenders)
       .where(
         and(
-          eq(tenders.userId, ctx.user.id),
+          eq(tenders.companyId, input.companyId),
           sql`${tenders.deadlineSubmission} >= ${nowString}`,
           sql`${tenders.deadlineSubmission} <= ${sevenDaysLaterString}`
         )
@@ -59,7 +61,7 @@ export const dashboardRouter = {
       .from(documents)
       .where(
         and(
-          eq(documents.userId, ctx.user.id),
+          eq(documents.companyId, input.companyId),
           sql`${documents.expirationDate} >= ${nowDateString}`,
           sql`${documents.expirationDate} <= ${thirtyDaysLaterDateString}`
         )
@@ -80,7 +82,7 @@ export const dashboardRouter = {
       .from(proposals)
       .where(
         and(
-          eq(proposals.userId, ctx.user.id),
+          eq(proposals.companyId, input.companyId),
           sql`${proposals.createdAt} >= ${thirtyDaysAgoString}`
         )
       )
@@ -94,7 +96,7 @@ export const dashboardRouter = {
         totalValue: sql<number>`SUM(totalSale)`,
       })
       .from(proposals)
-      .where(eq(proposals.userId, ctx.user.id));
+      .where(eq(proposals.companyId, input.companyId));
 
     return {
       tenders: {
@@ -119,7 +121,9 @@ export const dashboardRouter = {
     };
   }),
 
-  getTendersTimeline: protectedProcedure.query(async ({ ctx }) => {
+  getTendersTimeline: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ ctx, input }) => {
     const db = await getDb();
     if (!db) {
       throw new Error("Database not available");
@@ -137,7 +141,7 @@ export const dashboardRouter = {
       .from(tenders)
       .where(
         and(
-          eq(tenders.userId, ctx.user.id),
+          eq(tenders.companyId, input.companyId),
           sql`${tenders.createdAt} >= ${lastSixMonthsString}`
         )
       )
