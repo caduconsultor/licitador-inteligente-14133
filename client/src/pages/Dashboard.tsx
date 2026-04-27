@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
+import { CompanySelector } from "@/components/CompanySelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -43,14 +44,7 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-gray-600 mt-2">Visão geral de suas licitações e propostas</p>
           </div>
-          <Button 
-            onClick={() => setLocation("/settings/company")}
-            variant="outline"
-            className="gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            Configurar Empresa
-          </Button>
+          <CompanySelector />
         </div>
 
         {(stats?.alerts.criticalTenders?.length || 0) > 0 && (

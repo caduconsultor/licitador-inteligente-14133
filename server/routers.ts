@@ -43,6 +43,13 @@ export const appRouter = router({
       return await getCompaniesByUserId(ctx.user.id);
     }),
 
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const companies = await getCompaniesByUserId(ctx.user.id);
+        return companies.find(c => c.id === input.id);
+      }),
+
     searchCNPJ: publicProcedure
       .input(z.object({ cnpj: z.string() }))
       .query(async ({ input }) => {
